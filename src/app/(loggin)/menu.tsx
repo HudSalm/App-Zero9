@@ -4,7 +4,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-
+import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -19,7 +19,10 @@ const Menu = () => {
         </Text>
         <View style={styles.containerMenu}>
           <View style={styles.contentMenu}>
-            <Button style={styles.buttonMenu}>
+            <Button
+              style={styles.buttonMenu}
+              onPress={() => router.push("/ocurrence")}
+            >
               <AntDesign name="container" size={32} color="#FFF6FF" />
               <Text style={styles.textMenu}>Relatório de Ocorrências</Text>
             </Button>

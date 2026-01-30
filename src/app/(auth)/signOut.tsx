@@ -1,3 +1,4 @@
+import { Colors } from "@/src/components/colors";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
@@ -23,14 +24,8 @@ const SignOut = () => {
         </View>
 
         <View style={styles.containerInput}>
+          <Input onChangeText={setName} value={name} placeholder="Nome"></Input>
           <Input
-            style={styles.input}
-            onChangeText={setName}
-            value={name}
-            placeholder="Nome"
-          ></Input>
-          <Input
-            style={styles.input}
             onChangeText={setEmail}
             value={email}
             placeholder="Email"
@@ -38,21 +33,18 @@ const SignOut = () => {
             keyboardType="email-address"
           ></Input>
           <Input
-            style={styles.input}
             onChangeText={setPassword}
             value={password}
             placeholder="Senha"
             secureTextEntry={true}
           ></Input>
         </View>
-        <Button style={styles.button}>
-          <Text style={styles.textButton}>Cadastrar-se</Text>
-        </Button>
+        <Button>Cadastrar-se</Button>
         <Button
-          style={styles.buttonRegister}
+          style={styles.buttonLogin}
           onPress={() => router.push("/signIn")}
         >
-          <Text style={styles.textRegister}>Já tem conta?</Text>
+          <Text style={styles.textLogin}>Já tem conta?</Text>
           <Text style={{ fontWeight: "700", color: "#BDBDBD" }}>
             Fazer login
           </Text>
@@ -67,7 +59,7 @@ export default SignOut;
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1A1A1A",
+    backgroundColor: Colors.backgroundPrimary,
   },
 
   content: {
@@ -84,11 +76,11 @@ export const styles = StyleSheet.create({
 
   title: {
     fontSize: 25,
-    color: "#FFF6FF",
+    color: Colors.titleColor,
     fontWeight: "700",
   },
   textParagraph: {
-    color: "#BDBDBD",
+    color: Colors.paragraphColor,
     marginTop: -15,
   },
 
@@ -97,41 +89,12 @@ export const styles = StyleSheet.create({
     gap: 25,
   },
 
-  input: {
-    padding: 15,
-    backgroundColor: "#FFF6FF",
-    borderRadius: 5,
-  },
-
-  buttonForgot: {
-    alignSelf: "flex-end",
-    marginTop: -15,
+  buttonLogin: {
     padding: 10,
   },
-  text: {
-    color: "#BDBDBD",
-    fontSize: 12,
-  },
-
-  button: {
-    backgroundColor: "#4D4D4D",
-    padding: 15,
-    borderRadius: 5,
-    width: "80%",
-    alignItems: "center",
-  },
-  textButton: {
-    color: "#FFF6FF",
-    fontWeight: "700",
-  },
-  buttonRegister: {
-    padding: 10,
-    width: "30%",
-  },
-  textRegister: {
-    color: "#BDBDBD",
+  textLogin: {
+    color: Colors.buttonLinkColor,
     fontSize: 12,
     marginTop: -20,
-    textAlign: "center",
   },
 });

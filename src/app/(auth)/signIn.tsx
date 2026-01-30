@@ -1,3 +1,4 @@
+import { Colors } from "@/src/components/colors";
 import Button from "@/src/components/commons/button";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -23,7 +24,6 @@ export default function Index() {
 
         <View style={styles.containerInput}>
           <Input
-            style={styles.input}
             onChangeText={setEmail}
             value={email}
             placeholder="Email"
@@ -31,19 +31,16 @@ export default function Index() {
             keyboardType="email-address"
           ></Input>
           <Input
-            style={styles.input}
             onChangeText={setPassword}
             value={password}
             placeholder="Senha"
             secureTextEntry={true}
           ></Input>
           <Button style={styles.buttonForgot}>
-            <Text style={styles.text}>Esqueceu a senha?</Text>
+            <Text style={styles.textForgot}>Esqueceu a senha?</Text>
           </Button>
         </View>
-        <Button onPress={() => router.push("/menu")} style={styles.button}>
-          <Text style={styles.textButton}>Entrar</Text>
-        </Button>
+        <Button onPress={() => router.push("/(loggin)/menu")}>Entrar</Button>
         <Button
           style={styles.buttonRegister}
           onPress={() => router.push("/signOut")}
@@ -61,7 +58,7 @@ export default function Index() {
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1A1A1A",
+    backgroundColor: Colors.backgroundPrimary,
   },
 
   content: {
@@ -78,11 +75,11 @@ export const styles = StyleSheet.create({
 
   title: {
     fontSize: 25,
-    color: "#FFF6FF",
+    color: Colors.titleColor,
     fontWeight: "700",
   },
   textParagraph: {
-    color: "#BDBDBD",
+    color: Colors.paragraphColor,
     alignSelf: "flex-end",
     marginTop: -15,
   },
@@ -91,42 +88,22 @@ export const styles = StyleSheet.create({
     width: "80%",
     gap: 25,
   },
-
-  input: {
-    padding: 15,
-    backgroundColor: "#FFF6FF",
-    borderRadius: 5,
-  },
-
   buttonForgot: {
     alignSelf: "flex-end",
     marginTop: -15,
     padding: 10,
   },
-  text: {
-    color: "#BDBDBD",
+  textForgot: {
+    color: Colors.buttonLinkColor,
     fontSize: 12,
-  },
-
-  button: {
-    backgroundColor: "#4D4D4D",
-    padding: 15,
-    borderRadius: 5,
-    width: "80%",
-    alignItems: "center",
-  },
-  textButton: {
-    color: "#FFF6FF",
-    fontWeight: "700",
   },
   buttonRegister: {
     padding: 10,
-    width: "30%",
+    borderWidth: 1,
   },
   textRegister: {
-    color: "#BDBDBD",
+    color: Colors.buttonLinkColor,
     fontSize: 12,
     marginTop: -20,
-    textAlign: "center",
   },
 });

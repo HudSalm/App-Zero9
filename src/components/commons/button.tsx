@@ -3,9 +3,9 @@ import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
 const Button = ({ children, style, styleText, ...rest }: ButtonProps) => {
   return (
-    <TouchableOpacity style={[styles.baseButton, style]} {...rest}>
+    <TouchableOpacity style={[style || styles.baseButton]} {...rest}>
       {typeof children === "string" ? (
-        <Text style={styleText}>{children}</Text>
+        <Text style={styleText || styles.textButton}>{children}</Text>
       ) : (
         children
       )}
@@ -18,6 +18,14 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#4D4D4D",
+    padding: 15,
+    borderRadius: 5,
+    width: "80%",
+  },
+  textButton: {
+    color: "#FFF6FF",
+    fontWeight: "700",
   },
 });
 

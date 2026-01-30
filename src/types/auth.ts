@@ -1,11 +1,17 @@
 import { ReactNode } from "react";
 import {
-    KeyboardTypeOptions,
-    StyleProp,
-    TextInputProps,
-    TextStyle,
-    TouchableOpacityProps,
+  KeyboardTypeOptions,
+  StyleProp,
+  TextInputProps,
+  TextStyle,
+  TouchableOpacityProps,
 } from "react-native";
+
+export interface dropwdownProps {
+  key: number;
+  value: string;
+  disable?: boolean;
+}
 
 export interface InputProps extends TextInputProps {
   value: string;
