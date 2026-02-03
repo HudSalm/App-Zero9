@@ -1,5 +1,6 @@
 import { Image, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Colors } from "../colors";
 
 const Header = () => {
   return (
@@ -18,8 +19,9 @@ export const styles = StyleSheet.create({
     backgroundColor: "#000000",
     width: "100%",
     alignItems: "center",
-    justifyContent: "center",
     height: 80,
+    borderBottomWidth: 1,
+    borderColor: Colors.inputColor,
   },
 
   img: {

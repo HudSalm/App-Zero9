@@ -2,37 +2,36 @@ import { Colors } from "@/src/components/colors";
 import Button from "@/src/components/commons/button";
 import Warning from "@/src/components/commons/modal";
 import { supabase } from "@/src/lib/supabase";
-import { router } from "expo-router";
 import { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Input from "../../components/commons/input";
 
-const SignIn = () => {
+const forgotPassoword = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const [isNull, setIsNull] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const handleSignIn = async () => {
-    if (!email || !password) {
+  const sendEmail = async () => {
+    if (!email) {
       setShowWarning(true);
       setIsNull(true);
       return;
     }
-
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: "zero9-app://changePassword",
       });
 
       if (error) {
         setShowWarning(true);
+        setIsNull(true);
         return;
+      } else {
+        setShowWarning(true);
       }
     } catch (err) {
       console.error("Erro inesperado:", err);
@@ -45,12 +44,10 @@ const SignIn = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Image source={require("../../assets/zero9-icon.png")} />
-
         <View style={styles.containerTitle}>
-          <Text style={styles.title}>Bem-Vindo</Text>
+          <Text style={styles.title}>Entre com seu email:</Text>
           <Text style={styles.textParagraph}>
-            Faça seu login para acessar sua conta.
+            Enviaremos um link de restauração para o seu email.
           </Text>
         </View>
 
@@ -62,36 +59,17 @@ const SignIn = () => {
             autoCapitalize="none"
             keyboardType="email-address"
           ></Input>
-          <Input
-            onChangeText={setPassword}
-            value={password}
-            placeholder="Senha"
-            secureTextEntry={true}
-          ></Input>
-          <Button
-            onPress={() => router.push("/(auth)/forgotPassword")}
-            style={styles.buttonForgot}
-          >
-            <Text style={styles.textForgot}>Esqueceu a senha?</Text>
-          </Button>
         </View>
-        <Button onPress={handleSignIn} disabled={loading}>
-          {loading ? "Carregando..." : "Entrar"}
-        </Button>
-        <Button
-          style={styles.buttonRegister}
-          onPress={() => router.push("/(auth)/signUp")}
-        >
-          <Text style={styles.textRegister}>Não tem conta?</Text>
-          <Text style={{ fontWeight: "700", color: "#BDBDBD" }}>
-            Cadastre-se
-          </Text>
+        <Button onPress={sendEmail} disabled={loading}>
+          {loading ? "Carregando..." : "Enviar"}
         </Button>
       </View>
       {isNull ? (
         <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
           <Text style={styles.warningTitle}>Atenção</Text>
-          <Text>É obrigatório preencher todos os campos</Text>
+          <Text>
+            É necessário que você digite um email válido. Ex: user@email.com
+          </Text>
           <Button
             style={styles.warningButton}
             onPress={() => setShowWarning(false)}
@@ -101,8 +79,11 @@ const SignIn = () => {
         </Warning>
       ) : (
         <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
-          <Text style={styles.warningTitle}>Login não autorizado</Text>
-          <Text>O email ou a senha estão incorretos.</Text>
+          <Text style={styles.warningTitle}>Email enviado</Text>
+          <Text>
+            Caso o email seja válido, você receberá um email de recuperação de
+            senha{" "}
+          </Text>
           <Button
             style={styles.warningButton}
             onPress={() => setShowWarning(false)}
@@ -123,13 +104,12 @@ export const styles = StyleSheet.create({
 
   content: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
-    gap: 40,
+    gap: 20,
+    marginTop: 100,
   },
 
   containerTitle: {
-    alignItems: "center",
     gap: 15,
   },
 
@@ -143,28 +123,9 @@ export const styles = StyleSheet.create({
     alignSelf: "flex-end",
     marginTop: -15,
   },
-
   containerInput: {
     width: "80%",
-    gap: 25,
-  },
-  buttonForgot: {
-    alignSelf: "flex-end",
-    marginTop: -15,
-    padding: 10,
-  },
-  textForgot: {
-    color: Colors.buttonLinkColor,
-    fontSize: 12,
-  },
-  buttonRegister: {
-    padding: 10,
-    borderWidth: 1,
-  },
-  textRegister: {
-    color: Colors.buttonLinkColor,
-    fontSize: 12,
-    marginTop: -20,
+    marginBottom: 20,
   },
   warningTitle: {
     fontSize: 18,
@@ -179,4 +140,4 @@ export const styles = StyleSheet.create({
   },
 });
 
-export default SignIn;
+export default forgotPassoword;

@@ -2,22 +2,69 @@ import { Colors } from "@/src/components/colors";
 import Button from "@/src/components/commons/button";
 import Input from "@/src/components/commons/input";
 import InputDate from "@/src/components/commons/inputDate";
+import Warning from "@/src/components/commons/modal";
 import Dropdown from "@/src/components/commons/selectList";
-import Footer from "@/src/components/layout/footer";
 import Header from "@/src/components/layout/header";
+import { supabase } from "@/src/lib/supabase";
 import { dropwdownProps } from "@/src/types/auth";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Ocurrence = () => {
-  const [data, setData] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [name, setName] = useState("");
   const [observation, setObservation] = useState("");
   const [selectedEnterprise, setSelectedEnterprise] = useState("");
   const [selectedContract, setSelectedContract] = useState("");
   const [selectedReason, setSelectedReason] = useState("");
   const [selectedPosition, setSelectedPosition] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
+  const [isNull, setIsNull] = useState(false);
+
+  const sendOcurrence = async () => {
+    if (
+      !date ||
+      !name ||
+      !observation ||
+      !selectedEnterprise ||
+      !selectedContract ||
+      !selectedReason ||
+      !selectedPosition
+    ) {
+      setShowWarning(true);
+      setIsNull(true);
+      return;
+    }
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.from("ocurrences").insert({
+        date: date.split("/").reverse().join("-"),
+        name: name,
+        observation: observation,
+        enterprise: selectedEnterprise,
+        contract: selectedContract,
+        reason: selectedReason,
+        position: selectedPosition,
+      });
+
+      if (!error) {
+        alert("Sua ocorrência foi registrada com sucesso");
+      }
+
+      if (error) {
+        console.error("Erro inesperado:", error);
+        alert("Erro ao registrar as ocorrências, tente novamente");
+      }
+    } catch (err) {
+      console.error("Erro inesperado:", err);
+      alert("Ocorreu um erro inesperado ao registrar as ocorrências");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const enterprise: dropwdownProps[] = [
     { key: 1, value: "Fiel" },
@@ -51,8 +98,8 @@ const Ocurrence = () => {
         <Text style={styles.title}>Relatório de Ocorrências</Text>
         <View style={styles.containerInput}>
           <InputDate
-            value={data}
-            onChange={setData}
+            value={date}
+            onChange={setDate}
             placeholder="Data do Ocorrido"
           />
           <Input
@@ -88,19 +135,43 @@ const Ocurrence = () => {
             multiline={true}
           />
         </View>
-        <Button>Enviar</Button>
+        <Button onPress={sendOcurrence} disabled={loading}>
+          {loading ? "Carregando..." : "Enviar"}
+        </Button>
       </ScrollView>
-      <Footer />
+      {isNull ? (
+        <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
+          <Text style={styles.warningTitle}>Atenção</Text>
+          <Text>É obrigatório preencher todos os campos</Text>
+          <Button
+            style={styles.warningButton}
+            onPress={() => setShowWarning(false)}
+          >
+            <Text style={styles.warningButtonText}>Ok</Text>
+          </Button>
+        </Warning>
+      ) : (
+        <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
+          <Text style={styles.warningTitle}>Sucesso</Text>
+          <Text>Sua ocorrência foi registrada com sucesso</Text>
+          <Button
+            style={styles.warningButton}
+            onPress={() => setShowWarning(false)}
+          >
+            <Text style={styles.warningButtonText}>Ok</Text>
+          </Button>
+        </Warning>
+      )}
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.backgroundPrimary,
     flex: 1,
   },
   content: {
+    backgroundColor: Colors.backgroundPrimary,
     gap: 40,
     padding: 60,
     alignItems: "center",
@@ -122,6 +193,17 @@ const styles = StyleSheet.create({
     padding: 15,
     height: 200,
     textAlignVertical: "top",
+  },
+  warningTitle: {
+    fontSize: 18,
+    fontWeight: "500",
+  },
+  warningButton: {
+    padding: 15,
+    alignItems: "flex-end",
+  },
+  warningButtonText: {
+    color: "#235d32fa",
   },
 });
 

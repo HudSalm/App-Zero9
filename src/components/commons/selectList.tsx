@@ -16,7 +16,7 @@ const Dropdown = ({
         (setSelected(val), setHasColor(true));
       }}
       data={data}
-      save="key"
+      save="value"
       search={false}
       placeholder={placeholder}
       inputStyles={

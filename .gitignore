@@ -41,3 +41,7 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Ignora todos os arquivos de ambiente, independente do sufixo
+.env
+.env.*

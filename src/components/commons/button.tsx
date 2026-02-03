@@ -22,6 +22,8 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     width: "80%",
+    borderColor: "#FFF6FF",
+    borderWidth: 0.8,
   },
   textButton: {
     color: "#FFF6FF",
