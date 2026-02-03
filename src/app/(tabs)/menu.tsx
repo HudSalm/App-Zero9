@@ -83,7 +83,10 @@ const Menu = () => {
               <AntDesign name="container" size={32} color="#FFF6FF" />
               <Text style={styles.textMenu}>Relatório de Ocorrências</Text>
             </Button>
-            <Button style={styles.buttonMenu}>
+            <Button
+              onPress={() => router.push("/fuel")}
+              style={styles.buttonMenu}
+            >
               <MaterialCommunityIcons name="fuel" size={32} color="#FFF6FF" />
               <Text style={styles.textMenu}>Relatório de Combustivel</Text>
             </Button>
