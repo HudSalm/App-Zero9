@@ -1,20 +1,31 @@
 import { Colors } from "@/src/components/colors";
 import Button from "@/src/components/commons/button";
+import Warning from "@/src/components/commons/modal";
 import Header from "@/src/components/layout/header";
 import { useAuth } from "@/src/context/authContext";
 import { supabase } from "@/src/lib/supabase";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import * as FileSystem from "expo-file-system/legacy";
+import * as MediaLibrary from "expo-media-library";
 import { router } from "expo-router";
+import * as Sharing from "expo-sharing";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Menu = () => {
   const [name, setName] = useState("");
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [showDownloadReport, setShowDownloadReport] = useState(false);
 
   const logout = async () => {
     try {
@@ -59,6 +70,111 @@ const Menu = () => {
     fetchUser();
   }, [user]);
 
+  const exportToCSV = async (data: any, type: "fuel" | "ocurrences") => {
+    console.log(data);
+    const headers =
+      type === "fuel"
+        ? [
+            "Criado",
+            "Data",
+            "Valor",
+            "Veiculo",
+            "Tipo de Combustivel",
+            "Km inicial",
+            "Km final",
+            "Km rodado",
+            "Descricao",
+          ]
+        : [
+            "Criado",
+            "Data",
+            "Nome",
+            "Empresa",
+            "Contrato",
+            "Motivo",
+            "Função",
+            "Observacao",
+          ];
+
+    const csvString = [
+      headers,
+      ...data.map((item: any) =>
+        type === "fuel"
+          ? [
+              item.created_at,
+              item.date,
+              item.value,
+              item.vehicle,
+              item.type_fuel,
+              item.km_start,
+              item.km_end,
+              item.km_driven,
+              item.description,
+            ]
+          : [
+              item.created_at,
+              item.date,
+              item.name,
+              item.enterprise,
+              item.contract,
+              item.reason,
+              item.position,
+              item.observation,
+            ],
+      ),
+    ]
+      .map((e) => e.join(";"))
+      .join("\n");
+
+    try {
+      setLoading(true);
+      const fileName = `relatorio_${type}.csv`;
+      const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
+
+      await FileSystem.writeAsStringAsync(fileUri, csvString, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      if (Platform.OS === "android") {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+
+        if (status === "granted") {
+          const asset = await MediaLibrary.createAssetAsync(fileUri);
+          alert("Arquivo salvo com sucesso na pasta selecionada!");
+        } else {
+          await Sharing.shareAsync(fileUri);
+        }
+      } else {
+        -(await Sharing.shareAsync(fileUri));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao processar arquivo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const downloadReport = async (table: "fuel" | "ocurrences") => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.from(table).select("*");
+
+      if (!error && data) {
+        await exportToCSV(data, table);
+        console.log(data);
+      } else {
+        alert("Erro ao buscar dados do banco.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao se comunicar com o banco de dados.");
+    } finally {
+      setLoading(false);
+      setShowDownloadReport(false);
+    }
+  };
+
   if (loading) {
     return (
       <SafeAreaView style={styles.containerLoading}>
@@ -92,13 +208,13 @@ const Menu = () => {
             </Button>
           </View>
           <View style={styles.contentMenu}>
-            {/* <Button
+            <Button
               style={styles.buttonMenu}
-              onPress={() => router.push("/(tabs)/profile")}
+              onPress={() => setShowDownloadReport(true)}
             >
-              <Ionicons name="person" size={32} color="#FFF6FF" />
-              <Text style={styles.textMenu}>Perfil</Text>
-            </Button> */}
+              <AntDesign name="file-excel" size={32} color="#FFF6FF" />
+              <Text style={styles.textMenu}>Gerar relatório</Text>
+            </Button>
             <Button onPress={logout} style={styles.buttonMenu}>
               <MaterialIcons name="logout" size={32} color="#FFF6FF" />
               <Text style={styles.textMenu}>Sair</Text>
@@ -106,6 +222,27 @@ const Menu = () => {
           </View>
         </View>
       </View>
+      <Warning
+        visible={showDownloadReport}
+        onClose={() => setShowDownloadReport(false)}
+      >
+        <Text style={styles.modalTitle}>Exportar Relatórios</Text>
+        <Text>Escolha qual relatório deseja baixar:</Text>
+        <View style={styles.containerButton}>
+          <Button
+            style={styles.modalButton}
+            onPress={() => downloadReport("fuel")}
+          >
+            <Text style={styles.modalText}>Combustível</Text>
+          </Button>
+          <Button
+            style={styles.modalButton}
+            onPress={() => downloadReport("ocurrences")}
+          >
+            <Text style={styles.modalText}>Ocorrências</Text>
+          </Button>
+        </View>
+      </Warning>
     </SafeAreaView>
   );
 };
@@ -158,6 +295,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
     fontWeight: "700",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "500",
+  },
+  containerButton: {
+    flexDirection: "row",
+    gap: 20,
+    justifyContent: "flex-end",
+  },
+  modalButton: {
+    padding: 5,
+  },
+  modalText: {
+    color: "#235d32fa",
   },
 });
 

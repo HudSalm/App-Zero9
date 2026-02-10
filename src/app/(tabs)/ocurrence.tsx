@@ -74,7 +74,7 @@ const Ocurrence = () => {
 
   const contract: dropwdownProps[] = [
     { key: 1, value: "Bonde" },
-    { key: 2, value: "Vigia - Guapi" },
+    { key: 2, value: "Vigia - Guapi", disable: true },
     { key: 3, value: "Vigias/Oficial Manut." },
   ];
   const reason: dropwdownProps[] = [

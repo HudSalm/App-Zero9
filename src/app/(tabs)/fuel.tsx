@@ -14,9 +14,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const Fuel = () => {
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [value, setValue] = useState("");
-  const [observation, setObservation] = useState("");
-  const [selectedEnterprise, setSelectedEnterprise] = useState("");
-  const [selectedContract, setSelectedContract] = useState("");
+  const [description, setDescription] = useState("");
+  const [kmStart, setKmStart] = useState("");
+  const [kmEnd, setKmEnd] = useState("");
+  const [selectedTypeFuel, setSelectedTypeFuel] = useState("");
+  const [selectedVehicle, setSelectedVehicle] = useState("");
   const [loading, setLoading] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const [isNull, setIsNull] = useState(false);
@@ -25,9 +27,9 @@ const Fuel = () => {
     if (
       !date ||
       !value ||
-      !observation ||
-      !selectedEnterprise ||
-      !selectedContract
+      !description ||
+      !selectedTypeFuel ||
+      !selectedVehicle
     ) {
       setShowWarning(true);
       setIsNull(true);
@@ -36,12 +38,14 @@ const Fuel = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.from("ocurrences").insert({
+      const { data, error } = await supabase.from("fuel").insert({
         date: date.split("/").reverse().join("-"),
-        name: name,
-        observation: observation,
-        enterprise: selectedEnterprise,
-        contract: selectedContract,
+        value: parseFloat(value),
+        vehicle: selectedVehicle,
+        type_fuel: selectedTypeFuel,
+        km_start: parseFloat(kmStart),
+        km_end: parseFloat(kmEnd),
+        description: description,
       });
 
       if (!error) {
@@ -89,21 +93,32 @@ const Fuel = () => {
             value={value}
             onChangeText={setValue}
             placeholder="Valor colocado"
+            type="numeric"
           />
           <Dropdown
-            setSelected={(val: string) => setSelectedEnterprise(val)}
+            setSelected={(val: string) => setSelectedVehicle(val)}
             data={vehicle}
             placeholder="Veículo"
           />
           <Dropdown
-            setSelected={(val: string) => setSelectedContract(val)}
+            setSelected={(val: string) => setSelectedTypeFuel(val)}
             data={type_fuel}
             placeholder="Tipo de Combustível"
           />
           <Input
+            value={kmStart}
+            onChangeText={setKmStart}
+            placeholder="Kilometragem inicial"
+          />
+          <Input
+            value={kmEnd}
+            onChangeText={setKmEnd}
+            placeholder="Kilometragem final"
+          />
+          <Input
             style={styles.inputObservation}
-            value={observation}
-            onChangeText={setObservation}
+            value={description}
+            onChangeText={setDescription}
             placeholder="Observações"
             multiline={true}
           />
