@@ -67,6 +67,7 @@ const SignIn = () => {
             value={password}
             placeholder="Senha"
             secureTextEntry={true}
+            autoCapitalize="none"
           ></Input>
           <Button
             onPress={() => router.push("/(auth)/forgotPassword")}
@@ -159,7 +160,6 @@ export const styles = StyleSheet.create({
   },
   buttonRegister: {
     padding: 10,
-    borderWidth: 1,
   },
   textRegister: {
     color: Colors.buttonLinkColor,

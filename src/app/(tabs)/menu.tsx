@@ -145,7 +145,7 @@ const Menu = () => {
           await Sharing.shareAsync(fileUri);
         }
       } else {
-        -(await Sharing.shareAsync(fileUri));
+        await Sharing.shareAsync(fileUri);
       }
     } catch (err) {
       console.error(err);

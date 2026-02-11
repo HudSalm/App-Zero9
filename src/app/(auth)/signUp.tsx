@@ -75,6 +75,7 @@ const SignOut = () => {
             value={password}
             placeholder="Senha"
             secureTextEntry={true}
+            autoCapitalize="none"
           ></Input>
         </View>
         <Button onPress={handleSignUp} disabled={loading}>
