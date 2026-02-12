@@ -1,5 +1,6 @@
 import { Session } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
+import { Linking } from "react-native";
 import { supabase } from "../lib/supabase";
 import { AuthContextProps } from "../types/auth";
 
@@ -12,6 +13,14 @@ const AuthContext = createContext<AuthContextProps>({
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        supabase.auth.initialize();
+      }
+    });
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {

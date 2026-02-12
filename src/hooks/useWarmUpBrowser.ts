@@ -1,27 +1,42 @@
 import * as Linking from "expo-linking";
-import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { usePathname, useRouter } from "expo-router";
+import { useEffect, useRef } from "react";
 
 export function useHandlePasswordReset() {
   const router = useRouter();
+  const pathname = usePathname();
+  const hasHandledInitialUrl = useRef(false);
 
   useEffect(() => {
-    const subscription = Linking.addEventListener("url", (event) => {
-      handleUrl(event.url);
-    });
+    const handleDeepLink = (url: string | null) => {
+      if (!url) return;
 
-    Linking.getInitialURL().then((url) => {
-      if (url) handleUrl(url);
-    });
+      if (pathname.includes("changePassword")) {
+        console.log("Já estamos na tela de senha. Cancelando redirecionamento.");
+        return;
+      }
 
-    const handleUrl = async (url: string) => {
-      const parsed = Linking.parse(url);
-
-      if (parsed.path === "changePassword") {
+      if (url.includes("type=recovery") || url.includes("changePassword")) {
+        console.log("Link de recuperação detectado! Navegando...");
         router.replace("/(auth)/changePassword");
       }
     };
 
-    return () => subscription.remove();
-  }, []);
+    if (!hasHandledInitialUrl.current) {
+      Linking.getInitialURL().then((url) => {
+        if (url) {
+            handleDeepLink(url);
+            hasHandledInitialUrl.current = true; 
+        }
+      });
+    }
+
+    const subscription = Linking.addEventListener("url", (event) => {
+      handleDeepLink(event.url);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [pathname]);
 }
