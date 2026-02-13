@@ -3,6 +3,7 @@ import Button from "@/src/components/commons/button";
 import Warning from "@/src/components/commons/modal";
 import { supabase } from "@/src/lib/supabase";
 import * as Linking from "expo-linking";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -89,9 +90,7 @@ const ChangePassword = () => {
       setShowWarning(true);
       setWarningTitle("Sucesso");
       setWarningText("Senha alterada com sucesso!");
-      // Alert.alert("Sucesso", "Senha alterada com sucesso!", [
-      //   { text: "OK", onPress: () => {} },
-      // ]);
+      router.replace("/(tabs)/menu");
     } catch (err: any) {
       setShowWarning(true);
       setWarningTitle("Erro");
