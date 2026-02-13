@@ -1,5 +1,6 @@
 import { Colors } from "@/src/components/colors";
 import Button from "@/src/components/commons/button";
+import Warning from "@/src/components/commons/modal";
 import { supabase } from "@/src/lib/supabase";
 import * as Linking from "expo-linking";
 import { useEffect, useState } from "react";
@@ -12,6 +13,9 @@ const ChangePassword = () => {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSessionValid, setIsSessionValid] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
+  const [warningTitle, setWarningTitle] = useState("");
+  const [warningText, setWarningText] = useState("");
 
   useEffect(() => {
     const handleDeepLink = async () => {
@@ -54,17 +58,23 @@ const ChangePassword = () => {
 
   const sendNewPassword = async () => {
     if (!isSessionValid) {
-      Alert.alert("Erro", "Sessão inválida. Tente pedir um novo email");
+      setShowWarning(true);
+      setWarningTitle("Sessão encerrada");
+      setWarningText("Sessão inválida. Tente pedir um novo email");
       return;
     }
 
     if (!password || !passwordConfirm) {
-      Alert.alert("Erro", "Preencha todos os campos");
+      setShowWarning(true);
+      setWarningTitle("Campo não preenchido");
+      setWarningText("Por favor, preencha todos os campos");
       return;
     }
 
     if (password !== passwordConfirm) {
-      Alert.alert("Erro", "As senhas não coincidem");
+      setShowWarning(true);
+      setWarningTitle("Senhas diferentes");
+      setWarningText("As senhas digitadas nos campos não são idênticas");
       return;
     }
 
@@ -76,12 +86,18 @@ const ChangePassword = () => {
       });
 
       if (error) throw error;
-
-      Alert.alert("Sucesso", "Senha alterada com sucesso!", [
-        { text: "OK", onPress: () => {} },
-      ]);
+      setShowWarning(true);
+      setWarningTitle("Sucesso");
+      setWarningText("Senha alterada com sucesso!");
+      // Alert.alert("Sucesso", "Senha alterada com sucesso!", [
+      //   { text: "OK", onPress: () => {} },
+      // ]);
     } catch (err: any) {
-      Alert.alert("Erro", err.message);
+      setShowWarning(true);
+      setWarningTitle("Erro");
+      setWarningText(
+        "Ocorreu um erro desconhecido. Entre em contato com o suporte",
+      );
     } finally {
       setLoading(false);
     }
@@ -113,6 +129,16 @@ const ChangePassword = () => {
           {loading ? "Salvando..." : "Mudar senha"}
         </Button>
       </View>
+      <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
+        <Text style={styles.warningTitle}>{warningTitle}</Text>
+        <Text>{warningText}</Text>
+        <Button
+          style={styles.warningButton}
+          onPress={() => setShowWarning(false)}
+        >
+          <Text style={styles.warningButtonText}>Ok</Text>
+        </Button>
+      </Warning>
     </SafeAreaView>
   );
 };
@@ -141,6 +167,17 @@ export const styles = StyleSheet.create({
     width: "80%",
     marginBottom: 20,
     gap: 20,
+  },
+  warningTitle: {
+    fontSize: 18,
+    fontWeight: "500",
+  },
+  warningButton: {
+    padding: 15,
+    alignItems: "flex-end",
+  },
+  warningButtonText: {
+    color: "#32613ffa",
   },
 });
 

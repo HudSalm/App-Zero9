@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "relatorios",
+    "name": "Zero9 Group",
     "slug": "relatorios",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -18,7 +18,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#000000",
-        "foregroundImage": "./src/assets/zero9-icon.png"
+        "foregroundImage": "./src/assets/zero9-icon-menu.png"
       },
       "package": "com.hudsalm.relatorios"
     },

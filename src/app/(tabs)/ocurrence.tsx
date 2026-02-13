@@ -21,7 +21,8 @@ const Ocurrence = () => {
   const [selectedPosition, setSelectedPosition] = useState("");
   const [loading, setLoading] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
-  const [isNull, setIsNull] = useState(false);
+  const [warningTitle, setWarningTitle] = useState("");
+  const [warningText, setWarningText] = useState("");
 
   const sendOcurrence = async () => {
     if (
@@ -34,7 +35,8 @@ const Ocurrence = () => {
       !selectedPosition
     ) {
       setShowWarning(true);
-      setIsNull(true);
+      setWarningTitle("Campo não preenchido");
+      setWarningText("Por favor, preencha todos os campos");
       return;
     }
     setLoading(true);
@@ -51,16 +53,21 @@ const Ocurrence = () => {
       });
 
       if (!error) {
-        alert("Sua ocorrência foi registrada com sucesso");
+        setWarningTitle("Sucesso");
+        setWarningText("Sua ocorrência foi registrada com sucesso");
       }
 
       if (error) {
         console.error("Erro inesperado:", error);
-        alert("Erro ao registrar as ocorrências, tente novamente");
+        setWarningTitle("Erro ao registrar");
+        setWarningText("Erro ao registrar as ocorrências, tente novamente");
       }
     } catch (err) {
       console.error("Erro inesperado:", err);
-      alert("Ocorreu um erro inesperado ao registrar as ocorrências");
+      setWarningTitle("Erro inesperado");
+      setWarningText(
+        "Ocorreu um erro inesperado. Entre em contato com o suporte",
+      );
     } finally {
       setLoading(false);
     }
@@ -170,7 +177,6 @@ const Ocurrence = () => {
             setSelected={(val: string) => setSelectedPosition(val)}
             data={position}
             placeholder="Função"
-            
           />
           <Input
             style={styles.inputObservation}
@@ -184,29 +190,16 @@ const Ocurrence = () => {
           {loading ? "Carregando..." : "Enviar"}
         </Button>
       </ScrollView>
-      {isNull ? (
-        <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
-          <Text style={styles.warningTitle}>Atenção</Text>
-          <Text>É obrigatório preencher todos os campos</Text>
-          <Button
-            style={styles.warningButton}
-            onPress={() => setShowWarning(false)}
-          >
-            <Text style={styles.warningButtonText}>Ok</Text>
-          </Button>
-        </Warning>
-      ) : (
-        <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
-          <Text style={styles.warningTitle}>Sucesso</Text>
-          <Text>Sua ocorrência foi registrada com sucesso</Text>
-          <Button
-            style={styles.warningButton}
-            onPress={() => setShowWarning(false)}
-          >
-            <Text style={styles.warningButtonText}>Ok</Text>
-          </Button>
-        </Warning>
-      )}
+      <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
+        <Text style={styles.warningTitle}>{warningTitle}</Text>
+        <Text>{warningText}</Text>
+        <Button
+          style={styles.warningButton}
+          onPress={() => setShowWarning(false)}
+        >
+          <Text style={styles.warningButtonText}>Ok</Text>
+        </Button>
+      </Warning>
     </SafeAreaView>
   );
 };

@@ -12,13 +12,15 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showWarning, setShowWarning] = useState(false);
-  const [isNull, setIsNull] = useState(false);
+  const [warningTitle, setWarningTitle] = useState("");
+  const [warningText, setWarningText] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSignIn = async () => {
     if (!email || !password) {
       setShowWarning(true);
-      setIsNull(true);
+      setWarningTitle("Campo não preenchido.");
+      setWarningText("Por favor, preencha todos os campos");
       return;
     }
 
@@ -32,11 +34,17 @@ const SignIn = () => {
 
       if (error) {
         setShowWarning(true);
+        setWarningTitle("Acesso negado.");
+        setWarningText("Email ou senha estão incorretos, tente novamente.");
         return;
       }
     } catch (err) {
       console.error("Erro inesperado:", err);
-      alert("Ocorreu um erro inesperado ao tentar entrar.");
+      setShowWarning(true);
+      setWarningTitle("Erro inesperado");
+      setWarningText(
+        "Ocorreu um erro inesperado. Entre em contato com o suporte",
+      );
     } finally {
       setLoading(false);
     }
@@ -89,29 +97,16 @@ const SignIn = () => {
           </Text>
         </Button>
       </View>
-      {isNull ? (
-        <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
-          <Text style={styles.warningTitle}>Atenção</Text>
-          <Text>É obrigatório preencher todos os campos</Text>
-          <Button
-            style={styles.warningButton}
-            onPress={() => setShowWarning(false)}
-          >
-            <Text style={styles.warningButtonText}>Ok</Text>
-          </Button>
-        </Warning>
-      ) : (
-        <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
-          <Text style={styles.warningTitle}>Login não autorizado</Text>
-          <Text>O email ou a senha estão incorretos.</Text>
-          <Button
-            style={styles.warningButton}
-            onPress={() => setShowWarning(false)}
-          >
-            <Text style={styles.warningButtonText}>Ok</Text>
-          </Button>
-        </Warning>
-      )}
+      <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
+        <Text style={styles.warningTitle}>{warningTitle}</Text>
+        <Text>{warningText}</Text>
+        <Button
+          style={styles.warningButton}
+          onPress={() => setShowWarning(false)}
+        >
+          <Text style={styles.warningButtonText}>Ok</Text>
+        </Button>
+      </Warning>
     </SafeAreaView>
   );
 };

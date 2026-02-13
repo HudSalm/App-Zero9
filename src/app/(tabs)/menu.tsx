@@ -13,11 +13,10 @@ import * as Sharing from "expo-sharing";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Platform,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -28,18 +27,26 @@ const Menu = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showDownloadReport, setShowDownloadReport] = useState(false);
+  const [warningTitle, setWarningTitle] = useState("");
+  const [warningText, setWarningText] = useState("");
+  const [showWarning, setShowWarning] = useState(false);
 
   const logout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
 
       if (error) {
-        Alert.alert("Erro", "Erro ao deslogar: " + error.message);
+        setShowWarning(true);
+        setWarningTitle("Erro");
+        setWarningText("Erro ao deslogar");
         return;
       }
       router.replace("/(auth)/signIn");
     } catch (err) {
       console.error("Erro inesperado no logout:", err);
+      setShowWarning(true);
+      setWarningTitle("Erro inesperado ao deslogar");
+      setWarningText("Entre em contato com o suporte.");
     }
   };
 
@@ -63,7 +70,7 @@ const Menu = () => {
           }
         }
       } catch (err) {
-        console.error("Erro inesperado no logout:", err);
+        console.error("Erro inesperado ao buscar perfil", err);
       } finally {
         setLoading(false);
       }
@@ -87,14 +94,19 @@ const Menu = () => {
         await FileSystem.writeAsStringAsync(uri, fileContent, {
           encoding: FileSystem.EncodingType.UTF8,
         });
-
-        Alert.alert("Sucesso", "Relatório salvo na pasta selecionada!");
+        setShowWarning(true);
+        setWarningTitle("Sucesso");
+        setWarningText("Relatório salvo na pasta selecionada!");
       } else {
-        Alert.alert("Cancelado", "Permissão de pasta negada.");
+        setShowWarning(true);
+        setWarningTitle("Cancelado");
+        setWarningText("RPermissão de pasta negada.");
       }
     } catch (e) {
       console.error(e);
-      Alert.alert("Erro", "Não foi possível salvar o arquivo.");
+      setShowWarning(true);
+      setWarningTitle("Erro inesperado");
+      setWarningText("Não foi possível salvar o arquivo.");
     }
   };
 
@@ -166,7 +178,9 @@ const Menu = () => {
       }
     } catch (err) {
       console.error(err);
-      Alert.alert("Erro", "Erro ao processar arquivo.");
+      setShowWarning(true);
+      setWarningTitle("Erro");
+      setWarningText("Erro ao processar arquivo.");
     } finally {
       setLoading(false);
     }
@@ -180,11 +194,15 @@ const Menu = () => {
       if (!error && data) {
         await exportToCSV(data, table);
       } else {
-        Alert.alert("Erro", "Erro ao buscar dados do banco.");
+        setShowWarning(true);
+        setWarningTitle("Erro");
+        setWarningText("Erro ao buscar dados do banco.");
       }
     } catch (err) {
       console.error(err);
-      Alert.alert("Erro", "Erro ao se comunicar com o banco de dados.");
+      setShowWarning(true);
+      setWarningTitle("Erro");
+      setWarningText("Erro ao se comunicar com o banco de dados.");
     } finally {
       setLoading(false);
       setShowDownloadReport(false);
@@ -259,6 +277,16 @@ const Menu = () => {
           </Button>
         </View>
       </Warning>
+      <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
+        <Text style={styles.warningTitle}>{warningTitle}</Text>
+        <Text>{warningText}</Text>
+        <Button
+          style={styles.warningButton}
+          onPress={() => setShowWarning(false)}
+        >
+          <Text style={styles.warningButtonText}>Ok</Text>
+        </Button>
+      </Warning>
     </SafeAreaView>
   );
 };
@@ -326,6 +354,17 @@ const styles = StyleSheet.create({
   },
   modalText: {
     color: "#235d32fa",
+  },
+  warningTitle: {
+    fontSize: 18,
+    fontWeight: "500",
+  },
+  warningButton: {
+    padding: 15,
+    alignItems: "flex-end",
+  },
+  warningButtonText: {
+    color: "#32613ffa",
   },
 });
 

@@ -11,16 +11,24 @@ import Input from "../../components/commons/input";
 const SignOut = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordCOnfirm, setPasswordConfirm] = useState("");
   const [name, setName] = useState("");
   const [showWarning, setShowWarning] = useState(false);
-  const [isNull, setIsNull] = useState(false);
-
+  const [warningTitle, setWarningTitle] = useState("");
+  const [warningText, setWarningText] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
     if (!email || !password || !name) {
       setShowWarning(true);
-      setIsNull(true);
+      setWarningTitle("Campo não preenchido.");
+      setWarningText("Por favor, preencha todos os campos");
+      return;
+    }
+    if (password !== passwordCOnfirm) {
+      setShowWarning(true);
+      setWarningTitle("Senhas diferentes");
+      setWarningText("As senhas digitadas nos campos não são idênticas");
       return;
     }
 
@@ -39,11 +47,19 @@ const SignOut = () => {
 
       if (error) {
         setShowWarning(true);
+        setWarningTitle("Formatação inválida");
+        setWarningText(
+          "A formatação do email digitado não é válida. Use o modelo user@email.com.",
+        );
         return;
       }
     } catch (err) {
       console.error("Erro inesperado:", err);
-      alert("Ocorreu um erro inesperado ao tentar se Cadastrar.");
+      setShowWarning(true);
+      setWarningTitle("Erro inesperado");
+      setWarningText(
+        "Ocorreu um erro inesperado. Entre em contato com o suporte",
+      );
     } finally {
       setLoading(false);
     }
@@ -77,6 +93,13 @@ const SignOut = () => {
             secureTextEntry={true}
             autoCapitalize="none"
           ></Input>
+          <Input
+            onChangeText={setPasswordConfirm}
+            value={passwordCOnfirm}
+            placeholder="Confirme sua senha"
+            secureTextEntry={true}
+            autoCapitalize="none"
+          ></Input>
         </View>
         <Button onPress={handleSignUp} disabled={loading}>
           {loading ? "Carregando..." : "Cadastrar-se"}
@@ -91,32 +114,16 @@ const SignOut = () => {
           </Text>
         </Button>
       </View>
-      {isNull ? (
-        <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
-          <Text style={styles.warningTitle}>Atenção</Text>
-          <Text>É obrigatório preencher todos os campos</Text>
-          <Button
-            style={styles.warningButton}
-            onPress={() => setShowWarning(false)}
-          >
-            <Text style={styles.warningButtonText}>Ok</Text>
-          </Button>
-        </Warning>
-      ) : (
-        <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
-          <Text style={styles.warningTitle}>Formatação inválida</Text>
-          <Text>
-            A formatação do email digitado não é válida. Use o modelo
-            user@email.com.
-          </Text>
-          <Button
-            style={styles.warningButton}
-            onPress={() => setShowWarning(false)}
-          >
-            <Text style={styles.warningButtonText}>Ok</Text>
-          </Button>
-        </Warning>
-      )}
+      <Warning visible={showWarning} onClose={() => setShowWarning(false)}>
+        <Text style={styles.warningTitle}>{warningTitle}</Text>
+        <Text>{warningText}</Text>
+        <Button
+          style={styles.warningButton}
+          onPress={() => setShowWarning(false)}
+        >
+          <Text style={styles.warningButtonText}>Ok</Text>
+        </Button>
+      </Warning>
     </SafeAreaView>
   );
 };
