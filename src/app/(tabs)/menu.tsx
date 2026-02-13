@@ -8,18 +8,20 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as FileSystem from "expo-file-system/legacy";
-import * as MediaLibrary from "expo-media-library";
 import { router } from "expo-router";
 import * as Sharing from "expo-sharing";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Platform,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+const { StorageAccessFramework } = FileSystem;
 
 const Menu = () => {
   const [name, setName] = useState("");
@@ -32,7 +34,7 @@ const Menu = () => {
       const { error } = await supabase.auth.signOut();
 
       if (error) {
-        alert("Erro ao deslogar: " + error.message);
+        Alert.alert("Erro", "Erro ao deslogar: " + error.message);
         return;
       }
       router.replace("/(auth)/signIn");
@@ -70,8 +72,33 @@ const Menu = () => {
     fetchUser();
   }, [user]);
 
+  const saveFileAndroid = async (fileName: string, fileContent: string) => {
+    try {
+      const permissions =
+        await StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+      if (permissions.granted) {
+        const uri = await StorageAccessFramework.createFileAsync(
+          permissions.directoryUri,
+          fileName,
+          "text/csv",
+        );
+
+        await FileSystem.writeAsStringAsync(uri, fileContent, {
+          encoding: FileSystem.EncodingType.UTF8,
+        });
+
+        Alert.alert("Sucesso", "Relatório salvo na pasta selecionada!");
+      } else {
+        Alert.alert("Cancelado", "Permissão de pasta negada.");
+      }
+    } catch (e) {
+      console.error(e);
+      Alert.alert("Erro", "Não foi possível salvar o arquivo.");
+    }
+  };
+
   const exportToCSV = async (data: any, type: "fuel" | "ocurrences") => {
-    console.log(data);
     const headers =
       type === "fuel"
         ? [
@@ -97,7 +124,7 @@ const Menu = () => {
           ];
 
     const csvString = [
-      headers,
+      headers.join(";"),
       ...data.map((item: any) =>
         type === "fuel"
           ? [
@@ -110,7 +137,7 @@ const Menu = () => {
               item.km_end,
               item.km_driven,
               item.description,
-            ]
+            ].join(";")
           : [
               item.created_at,
               item.date,
@@ -120,36 +147,26 @@ const Menu = () => {
               item.reason,
               item.position,
               item.observation,
-            ],
+            ].join(";"),
       ),
-    ]
-      .map((e) => e.join(";"))
-      .join("\n");
+    ].join("\n");
 
     try {
       setLoading(true);
       const fileName = `relatorio_${type}.csv`;
-      const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
-
-      await FileSystem.writeAsStringAsync(fileUri, csvString, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
 
       if (Platform.OS === "android") {
-        const { status } = await MediaLibrary.requestPermissionsAsync();
-
-        if (status === "granted") {
-          const asset = await MediaLibrary.createAssetAsync(fileUri);
-          alert("Arquivo salvo com sucesso na pasta selecionada!");
-        } else {
-          await Sharing.shareAsync(fileUri);
-        }
+        await saveFileAndroid(fileName, csvString);
       } else {
+        const fileUri = `${FileSystem.cacheDirectory}${fileName}`;
+        await FileSystem.writeAsStringAsync(fileUri, csvString, {
+          encoding: FileSystem.EncodingType.UTF8,
+        });
         await Sharing.shareAsync(fileUri);
       }
     } catch (err) {
       console.error(err);
-      alert("Erro ao processar arquivo.");
+      Alert.alert("Erro", "Erro ao processar arquivo.");
     } finally {
       setLoading(false);
     }
@@ -162,13 +179,12 @@ const Menu = () => {
 
       if (!error && data) {
         await exportToCSV(data, table);
-        console.log(data);
       } else {
-        alert("Erro ao buscar dados do banco.");
+        Alert.alert("Erro", "Erro ao buscar dados do banco.");
       }
     } catch (err) {
       console.error(err);
-      alert("Erro ao se comunicar com o banco de dados.");
+      Alert.alert("Erro", "Erro ao se comunicar com o banco de dados.");
     } finally {
       setLoading(false);
       setShowDownloadReport(false);

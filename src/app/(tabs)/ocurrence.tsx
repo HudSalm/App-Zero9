@@ -69,26 +69,70 @@ const Ocurrence = () => {
   const enterprise: dropwdownProps[] = [
     { key: 1, value: "Fiel" },
     { key: 2, value: "Fender" },
-    { key: 3, value: "Unobike" },
+    { key: 3, value: "Galatas" },
   ];
-
-  const contract: dropwdownProps[] = [
-    { key: 1, value: "Bonde" },
-    { key: 2, value: "Vigia - Guapi", disable: true },
-    { key: 3, value: "Vigias/Oficial Manut." },
-  ];
+  let contract: dropwdownProps[] = [];
+  let position: dropwdownProps[] = [];
+  switch (selectedEnterprise) {
+    case "Fiel":
+      contract = [
+        { key: 1, value: "Bonde" },
+        { key: 2, value: "Vigia - Guapi", disabled: true },
+        { key: 3, value: "Vigias/Oficial Manut", disabled: true },
+        { key: 4, value: "Escolta", disabled: true },
+      ];
+      position = [
+        { key: 1, value: "Motorneiro" },
+        { key: 2, value: "Auxiliar de Motorneiro" },
+        { key: 3, value: "Vigia", disabled: true },
+        { key: 4, value: "Porteiro", disabled: true },
+        { key: 5, value: "Oficial de manutenção", disabled: true },
+        { key: 6, value: "Escolta", disabled: true },
+        { key: 7, value: "Outros" },
+      ];
+      break;
+    case "Fender":
+      contract = [
+        { key: 1, value: "Bonde", disabled: true },
+        { key: 2, value: "Vigia - Guapi" },
+        { key: 3, value: "Vigias/Oficial Manut." },
+        { key: 4, value: "Escolta", disabled: true },
+      ];
+      position = [
+        { key: 1, value: "Motorneiro", disabled: true },
+        { key: 2, value: "Auxiliar de Motorneiro", disabled: true },
+        { key: 3, value: "Vigia" },
+        { key: 4, value: "Porteiro" },
+        { key: 5, value: "Oficial de manutenção" },
+        { key: 6, value: "Escolta", disabled: true },
+        { key: 7, value: "Outros" },
+      ];
+      break;
+    case "Galatas":
+      contract = [
+        { key: 1, value: "Bonde", disabled: true },
+        { key: 2, value: "Vigia - Guapi", disabled: true },
+        { key: 3, value: "Vigias/Oficial Manut.", disabled: true },
+        { key: 4, value: "Escolta" },
+      ];
+      position = [
+        { key: 1, value: "Motorneiro", disabled: true },
+        { key: 2, value: "Auxiliar de Motorneiro", disabled: true },
+        { key: 3, value: "Vigia", disabled: true },
+        { key: 4, value: "Porteiro", disabled: true },
+        { key: 5, value: "Oficial de manutenção", disabled: true },
+        { key: 6, value: "Escolta" },
+        { key: 7, value: "Outros" },
+      ];
+      break;
+    default:
+      break;
+  }
   const reason: dropwdownProps[] = [
     { key: 1, value: "Falta" },
     { key: 2, value: "Suspensão" },
     { key: 3, value: "Problemas de saúde" },
     { key: 4, value: "Outros" },
-  ];
-  const position: dropwdownProps[] = [
-    { key: 1, value: "Motorneiro" },
-    { key: 2, value: "Auxiliar de Motorneiro" },
-    { key: 3, value: "Vigia" },
-    { key: 4, value: "Porteiro" },
-    { key: 5, value: "Oficial de manutenção" },
   ];
 
   return (
@@ -126,6 +170,7 @@ const Ocurrence = () => {
             setSelected={(val: string) => setSelectedPosition(val)}
             data={position}
             placeholder="Função"
+            
           />
           <Input
             style={styles.inputObservation}

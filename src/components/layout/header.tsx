@@ -17,11 +17,12 @@ const Header = () => {
 export const styles = StyleSheet.create({
   container: {
     backgroundColor: "#000000",
-    width: "100%",
     alignItems: "center",
+    justifyContent: "center",
     height: 80,
     borderBottomWidth: 1,
     borderColor: Colors.inputColor,
+    paddingTop: -18,
   },
 
   img: {

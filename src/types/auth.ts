@@ -12,7 +12,7 @@ import {
 export interface dropwdownProps {
   key: number;
   value: string;
-  disable?: boolean;
+  disabled?: boolean;
 }
 
 export interface InputProps extends TextInputProps {

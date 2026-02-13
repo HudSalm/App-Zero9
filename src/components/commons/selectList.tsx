@@ -33,6 +33,7 @@ const Dropdown = ({
       dropdownItemStyles={{ backgroundColor: Colors.inputColor }}
       dropdownStyles={{ backgroundColor: Colors.inputColor }}
       dropdownTextStyles={{ color: Colors.inputValueColor }}
+      notFoundText="Selecione uma empresa primeiro"
       {...rest}
     />
   );
